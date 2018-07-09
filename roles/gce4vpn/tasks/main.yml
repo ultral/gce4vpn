@@ -1,0 +1,5 @@
+---
+
+- include: docker.yml
+- include: terraform.yml
+- include: gcloud.yml

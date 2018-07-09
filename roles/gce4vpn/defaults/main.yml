@@ -1,0 +1,5 @@
+---
+
+terraform_source: https://releases.hashicorp.com/terraform/0.11.7/terraform_0.11.7_linux_amd64.zip
+kubectl_source: https://storage.googleapis.com/kubernetes-release/release/v1.11.0/bin/linux/amd64/kubectl
+docker_repo: https://download.docker.com/linux/centos/docker-ce.repo
