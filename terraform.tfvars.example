@@ -1,0 +1,4 @@
+k8s_cluster_name = "gce4vpn-k8s"
+k8s_nodes_count = 1
+k8s_admin_username = "secret_login"
+k8s_admin_password = "secret_password"

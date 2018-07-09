@@ -9,7 +9,7 @@ vm_box     = 'bento/centos-7.4'
 vm_ram     = 512
 no_proxy   = ENV['no_proxy']
 http_proxy = ENV['http_proxy']
-rsync_excl = ['.git/', '.vagrant/', '.kitchen/']
+rsync_excl = ['.git/', '.vagrant/', '.kitchen/', '.terraform/', '.terraform.tfstate.lock', '*.tfstate']
 
 puts "Use http_proxy: '#{http_proxy}'"
 puts "Use no_proxy  : '#{no_proxy}'"
