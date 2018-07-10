@@ -1,0 +1,24 @@
+---
+- name: Download kubectl
+  get_url:
+    url: "{{ kubectl_source }}"
+    dest: /usr/bin/kubectl
+    mode: 0755
+    force: no
+    owner: root
+    group: root
+
+- name: prepare kube dir
+  file:
+    dest: /root/.kube
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: prepare kube config file
+  copy:
+    content: ""
+    dest: /root/.kube/config
+    force: no
+    mode: 0755
