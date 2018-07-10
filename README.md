@@ -44,3 +44,6 @@ gcloud services enable container.googleapis.com
 terraform init
 terraform apply
 ```
+
+
+gcloud container clusters get-credentials --zone europe-north1-a
