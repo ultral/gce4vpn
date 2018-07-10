@@ -18,7 +18,7 @@ variable "k8s_admin_password" {
 
 variable "k8s_cluster_primary_zone" {
   description = "Cluster primary zone name."
-  default = "${var.google_primary_zone}"
+  default = "europe-north1-a"
 }
 
 variable "k8s_cluster_slave_zone1" {

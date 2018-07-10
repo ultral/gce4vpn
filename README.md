@@ -46,4 +46,5 @@ terraform apply
 ```
 
 
+GOOGLE_CREDENTIALS=$(cat .key.json) terraform init
 gcloud container clusters get-credentials --zone europe-north1-a

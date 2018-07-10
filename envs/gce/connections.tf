@@ -1,10 +1,10 @@
-terraform {
-  backend "gcs" {
-    bucket  = "terraform-remote-states"
-    prefix  = "terraform.tfstate"
-    project = "gce4vpn2"
-  }
-}
+#terraform {
+#  backend "gcs" {
+#    bucket  = "terraform-remote-states"
+#    prefix  = "terraform.tfstate"
+#    project = "gce4vpn2"
+#  }
+#}
 
 provider "google" {
   credentials = "${file("./.key.json")}"
