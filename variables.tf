@@ -54,3 +54,8 @@ variable "google_project_name" {
   description = "Project name"
   default = "gce4vpn2"
 }
+
+variable "text_inside_test_container" {
+  description = "text message"
+  default     = "hello 123"
+}
