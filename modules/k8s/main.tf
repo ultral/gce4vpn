@@ -32,4 +32,8 @@ resource "google_container_cluster" "gcp_vpn" {
 
     tags = ["gce4vpn"]
   }
+
+  provisioner "local-exec" {
+    command = "gcloud container clusters get-credentials ${var.k8s_cluster_name} --zone ${var.k8s_cluster_primary_zone} ; kubectl get pods"
+  }
 }

@@ -1,3 +1,4 @@
+#GOOGLE_CREDENTIALS=$(cat .key.json) terraform init
 #terraform {
 #  backend "gcs" {
 #    bucket  = "terraform-remote-states"
