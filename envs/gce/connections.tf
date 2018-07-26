@@ -9,6 +9,6 @@
 
 provider "google" {
   credentials = "${file("./.key.json")}"
-  project     = "gce4vpn2"
+  project     = "${file("./.project.name")}"
   region      = "${var.google_primary_zone}"
 }

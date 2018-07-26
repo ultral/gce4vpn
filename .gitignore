@@ -8,3 +8,4 @@
 *.tfstate.backup
 terraform.tfvars
 .key.json
+.project.name

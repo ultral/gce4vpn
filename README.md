@@ -2,6 +2,13 @@
 
 VM for managing VPN in GCE
 
+# justdoit
+```
+vagrant up
+vagrant ssh
+PROJECT_NAME=blahblah make all
+```
+
 # Start
 
 ## Create VM
