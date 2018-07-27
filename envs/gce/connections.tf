@@ -1,11 +1,9 @@
-#GOOGLE_CREDENTIALS=$(cat .key.json) terraform init
-#terraform {
-#  backend "gcs" {
-#    bucket  = "terraform-remote-states"
-#    prefix  = "terraform.tfstate"
-#    project = "gce4vpn2"
-#  }
-#}
+terraform {
+  backend "gcs" {
+    #bucket  = "gce4vpn-terraform-remote-states"
+    prefix  = "terraform.tfstate"
+  }
+}
 
 provider "google" {
   credentials = "${file("./.key.json")}"

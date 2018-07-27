@@ -6,7 +6,7 @@ VM for managing VPN in GCE
 ```
 vagrant up
 vagrant ssh
-PROJECT_NAME=blahblah make all
+runme.sh --gcloud-init --terraform-apply --project-id gce4vpn6
 ```
 
 # Start
