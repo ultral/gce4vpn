@@ -6,6 +6,6 @@
 *.tfstate
 *.tfstate.*.backup
 *.tfstate.backup
-terraform.tfvars
+*.tfvars
 .key.json
 .project.name
