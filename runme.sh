@@ -2,8 +2,8 @@
 set -e
 
 PLAN_DIR="envs/gce"
-PROJECT_ID=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^project_name=" | cut -f 2 -d "=" | tr -d "\n\r\"")
-BUCKET_NAME=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^bucket_name=" | cut -f 2 -d "=" | tr -d "\n\r\"")
+PROJECT_ID=$(tr -d " \t" < "${PLAN_DIR}/config_backend.tfvars"| grep "^project=" | cut -f 2 -d "=" | tr -d "\n\r\"")
+BUCKET_NAME=$(tr -d " \t" < "${PLAN_DIR}/config_backend.tfvars"| grep "^bucket=" | cut -f 2 -d "=" | tr -d "\n\r\"")
 
 usage () {
   echo "Usage: $0 [--gcloud-init] [--terraform-apply] [--terraform-destroy][--help] [--project-id <some-name>]"
@@ -69,7 +69,10 @@ terraform_destroy () {
   PLAN_DIR="$1"
   GOOGLE_CREDS=$(cat "${PLAN_DIR}/.key.json")
 
-  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform destroy "${PLAN_DIR}"
+  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform destroy  \
+    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
+    -var-file="${PLAN_DIR}/config_backend.tfvars" \
+    "${PLAN_DIR}"
 }
 
 
