@@ -13,7 +13,7 @@ resource "kubernetes_replication_controller" "openvpn" {
     }
     template {
       container {
-        image = "kylemanna/openvpn"
+        image = "ptlange/openvpn"
         name  = "opevpnsrv"
 
         port {
@@ -33,6 +33,26 @@ resource "kubernetes_replication_controller" "openvpn" {
 
         capabilities{
           add = ["NET_ADMIN"]
+        }
+        volume_mount {
+          name = "/etc/openvpn/pki"
+          mount_path = "openvpn-pki"
+        }
+        volume_mount {
+          name = "/etc/openvpn/crl"
+          mount_path = "openvpn-crl"
+        }
+        volume_mount {
+          name = "/etc/openvpn/ccd"
+          mount_path = "openvpn-ccd"
+        }
+        volume_mount {
+          name = "/etc/openvpn/portmapping"
+          mount_path = "openvpn-portmapping"
+        }
+        volume_mount {
+          name = "/etc/openvpn/status"
+          mount_path = "openvpn-status"
         }
       }
       volume {
@@ -57,11 +77,11 @@ resource "kubernetes_service" "openvpn-service" {
 
     port {
       name        = "https"
-      port        = 443
-      target_port = 1194
+      port        = 1194
+      target_port = 443
     }
 
-    type = "LoadBalancer"
+    type = "NodePort"
   }
 }
 

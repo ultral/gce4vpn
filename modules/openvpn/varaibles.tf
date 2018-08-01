@@ -22,6 +22,38 @@ variable "k8s_cluster_ca_certificate" {
   description = "K8s cluster CA cert."
 }
 
-variable "openvpn_persistent_store_zone" {
-  description = "Zone for disk with persistent data."
+variable "openvpn_private_key" {
+  description = "Base64 private.key."
+}
+
+variable "openvpn_ca_crt" {
+  description = "Base64 ca.crt."
+}
+
+variable "openvpn_certificate_crt" {
+  description = "Base64 certificate.crt."
+}
+
+variable "openvpn_dh_pem" {
+  description = "Base64 dh.pem."
+}
+
+variable "openvpn_ta_key" {
+  description = "Base64 ta.key."
+}
+
+variable "service_cidr" {
+  description = "Service CIDR."
+}
+
+variable "pod_cidr" {
+  description = "Pod CIDR."
+}
+
+variable "server_url" {
+  description = "Server URL."
+}
+
+variable "domain" {
+  description = "Domain."
 }
