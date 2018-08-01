@@ -45,7 +45,7 @@ resource "kubernetes_replication_controller" "openvpn" {
   }
 }
 
-resource "kubernetes_service" "echo" {
+resource "kubernetes_service" "openvpn-service" {
   metadata {
     name = "openvpn-publish"
   }

@@ -23,6 +23,16 @@ Vagrant.configure('2') do |config|
     config.proxy.http     = http_proxy
     config.proxy.https    = http_proxy
     config.proxy.no_proxy = no_proxy
+
+    proxy_docker_conf_dir = '/etc/systemd/system/docker.service.d'
+    proxy_docker_config   = "#{proxy_docker_conf_dir}/30-proxy.conf"
+    config.vm.provision 'shell', inline: " \
+      mkdir -p #{proxy_docker_conf_dir} ;\
+      echo '[Service]' > #{proxy_docker_config} ;\
+      echo 'Environment=HTTP_PROXY=#{http_proxy}' >> #{proxy_docker_config} ;\
+      echo 'Environment=HTTPS_PROXY=#{http_proxy} >> #{proxy_docker_config} ;\
+      echo 'Environment=NO_PROXY=#{no_proxy}' >> #{proxy_docker_config} ;\
+      echo >> #{proxy_docker_config}"
   end
 
   config.vm.synced_folder '.', '/vagrant', type: 'rsync', rsync__exclude: rsync_excl
