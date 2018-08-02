@@ -53,7 +53,3 @@ variable "pod_cidr" {
 variable "server_url" {
   description = "Server URL."
 }
-
-variable "domain" {
-  description = "Domain."
-}

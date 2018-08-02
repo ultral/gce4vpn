@@ -4,9 +4,19 @@ VM for managing VPN in GCE
 
 # justdoit
 ```
-vagrant up
-vagrant ssh
-runme.sh --gcloud-init --terraform-apply --project-id gce4vpn6
+$ vagrant up
+$ vagrant ssh
+$ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.goncharov.xyz:1194 -v $PWD:/etc/openvpn:z -ti ptlange/openvpn ovpn_initpki
+
+$ docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn:z -ti ptlange/openvpn easyrsa gen-crl
+
+$ gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep servicesIpv4Cidr
+servicesIpv4Cidr: 10.55.240.0/20
+
+$ gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a | grep clusterIpv4Cidr
+clusterIpv4Cidr: 10.52.0.0/14
+
+$ runme.sh --gcloud-init --terraform-apply --project-id gce4vpn6
 ```
 
 # Start
@@ -53,3 +63,5 @@ terraform apply
 ```
 
 
+# LINKS
+[pieterlange/kube-openvpn](https://github.com/pieterlange/kube-openvpn)

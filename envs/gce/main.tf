@@ -47,5 +47,4 @@ module "openvpn" {
   service_cidr = "10.55.240.0/20"
   pod_cidr = "10.52.0.0/14"
   server_url = "tcp://${var.openvpn_common_name}:443"
-  domain = "svc.cluster.local"
 }

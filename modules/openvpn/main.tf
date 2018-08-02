@@ -61,24 +61,6 @@ resource "kubernetes_replication_controller" "openvpn" {
             }
           }
         }
-        env {
-          name = "OVPN_K8S_DOMAIN"
-          value_from {
-            config_map_key_ref {
-              name = "openvpn-settings"
-              key = "domain"
-            }
-          }
-        }
-        env {
-          name = "OVPN_STATUS"
-          value_from {
-            config_map_key_ref {
-              name = "openvpn-settings"
-              key = "statusfile"
-            }
-          }
-        }
 
         resources{
           limits{
@@ -95,51 +77,12 @@ resource "kubernetes_replication_controller" "openvpn" {
           name = "/etc/openvpn/pki"
           mount_path = "openvpn-pki"
         }
-        volume_mount {
-          name = "/etc/openvpn/crl"
-          mount_path = "openvpn-crl"
-        }
-        volume_mount {
-          name = "/etc/openvpn/ccd"
-          mount_path = "openvpn-ccd"
-        }
-        volume_mount {
-          name = "/etc/openvpn/portmapping"
-          mount_path = "openvpn-portmapping"
-        }
-        volume_mount {
-          name = "/etc/openvpn/status"
-          mount_path = "openvpn-status"
-        }
       }
       volume {
         name = "openvpn-pki"
         secret {
             secret_name = "openvpn-pki"
             default_mode = 0400
-        }
-      }
-      volume {
-        name = "openvpn-status"
-        empty_dir {}
-      }
-      volume {
-        name = "openvpn-portmapping"
-        config_map {
-          name = "openvpn-portmapping"
-        }
-      }
-      volume {
-        name = "openvpn-crl"
-        config_map {
-          name = "openvpn-crl"
-          default_mode = 0555
-        }
-      }
-      volume {
-        name = "openvpn-ccd"
-        config_map {
-          name = "openvpn-ccd"
         }
       }
     }
