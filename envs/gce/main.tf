@@ -17,16 +17,11 @@ module "echo" {
 module "pki" {
   source = "../../modules/pki"
 
-  #openvpn_raw_private_key = "${file("${path.root}/pki/private/${var.openvpn_common_name}.key")}"
-  #openvpn_raw_ca_crt = "${file("${path.root}/ca.crt")}"
-  #openvpn_raw_certificate_crt = "${file("${path.root}/issued/${var.openvpn_common_name}.crt")}"
-  #openvpn_raw_dh_pem = "${file("${path.root}/pki/dh.pem")}"
-  #openvpn_raw_ta_key = "${file("${path.root}/pki/ta.key")}"
-  openvpn_raw_private_key = "${file("/root/2/pki/private/${var.openvpn_common_name}.key")}"
-  openvpn_raw_ca_crt = "${file("/root/2/pki/ca.crt")}"
-  openvpn_raw_certificate_crt = "${file("/root/2/pki/issued/${var.openvpn_common_name}.crt")}"
-  openvpn_raw_dh_pem = "${file("/root/2/pki/dh.pem")}"
-  openvpn_raw_ta_key = "${file("/root/2/pki/ta.key")}"
+  openvpn_file_private_key = "${var.openvpn_file_private_key}"
+  openvpn_file_ca_crt = "${var.openvpn_file_ca_crt}"
+  openvpn_file_certificate_crt = "${var.openvpn_file_certificate_crt}"
+  openvpn_file_dh_pem = "${var.openvpn_file_dh_pem}"
+  openvpn_file_ta_key = "${var.openvpn_file_ta_key}"
 }
 
 module "openvpn" {
@@ -44,7 +39,7 @@ module "openvpn" {
   openvpn_dh_pem = "${base64encode(module.pki.openvpn_dh_pem)}"
   openvpn_ta_key = "${base64encode(module.pki.openvpn_ta_key)}"
 
-  service_cidr = "10.55.240.0/20"
-  pod_cidr = "10.52.0.0/14"
+  service_cidr = "${var.service_cidr}"
+  pod_cidr = "${var.pod_cidr}"
   server_url = "tcp://${var.openvpn_common_name}:443"
 }

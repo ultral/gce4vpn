@@ -19,6 +19,7 @@ clusterIpv4Cidr: 10.52.0.0/14
 $ runme.sh --gcloud-init --terraform-apply --project-id gce4vpn6
 
 $ gcloud container clusters get-credentials gce4vpn-k8s --zone europe-north1-a
+
 ```
 
 # Start
