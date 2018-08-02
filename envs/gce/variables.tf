@@ -39,10 +39,10 @@ variable "openvpn_file_ta_key" {
   description = "Path to your ta.key file."
 }
 
-variable "service_cidr" {
+variable "k8s_service_cidr" {
   description = "gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep servicesIpv4Cidr"
 }
 
-variable "pod_cidr" {
+variable "k8s_pod_cidr" {
   description = "gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep clusterIpv4Cidr"
 }

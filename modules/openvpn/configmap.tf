@@ -4,11 +4,8 @@ resource "kubernetes_config_map" "openvpn" {
   }
 
   data {
-    servicecidr = "${var.service_cidr}"
-    podcidr = "${var.pod_cidr}"
-    serverurl = "${var.server_url}"
+    servicecidr = "${var.k8s_service_cidr}"
+    podcidr = "${var.k8s_pod_cidr}"
+    serverurl = "${var.openvpn_server_url}"
   }
 }
-
-
-

@@ -42,14 +42,14 @@ variable "openvpn_ta_key" {
   description = "Base64 ta.key."
 }
 
-variable "service_cidr" {
+variable "k8s_service_cidr" {
   description = "Service CIDR."
 }
 
-variable "pod_cidr" {
+variable "k8s_pod_cidr" {
   description = "Pod CIDR."
 }
 
-variable "server_url" {
+variable "openvpn_server_url" {
   description = "Server URL."
 }
