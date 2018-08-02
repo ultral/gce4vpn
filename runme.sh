@@ -57,6 +57,10 @@ terraform_run () {
   GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform init \
     -backend-config="${PLAN_DIR}/config_backend.tfvars" \
     "${PLAN_DIR}"
+  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform plan \
+    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
+    -var-file="${PLAN_DIR}/config_backend.tfvars" \
+    "${PLAN_DIR}"
   GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform apply \
     -var-file="${PLAN_DIR}/config_secrets.tfvars" \
     -var-file="${PLAN_DIR}/config_backend.tfvars" \

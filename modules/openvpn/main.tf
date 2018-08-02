@@ -74,8 +74,8 @@ resource "kubernetes_replication_controller" "openvpn" {
         }
 
         volume_mount {
-          name = "/etc/openvpn/pki"
-          mount_path = "openvpn-pki"
+          mount_path = "/etc/openvpn/pki"
+          name = "openvpn-pki"
         }
       }
       volume {
@@ -89,7 +89,7 @@ resource "kubernetes_replication_controller" "openvpn" {
   }
 }
 
-resource "kubernetes_service" "openvpn-service" {
+resource "kubernetes_service" "openvpn" {
   metadata {
     name = "openvpn-publish"
   }
@@ -105,7 +105,7 @@ resource "kubernetes_service" "openvpn-service" {
       target_port = 443
     }
 
-    type = "NodePort"
+    type = "LoadBalancer"
   }
 }
 
