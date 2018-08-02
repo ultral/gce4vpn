@@ -25,10 +25,10 @@ module "openvpn" {
   k8s_client_key              = "${base64decode(module.k8s.client_key)}"
   k8s_cluster_ca_certificate  = "${base64decode(module.k8s.cluster_ca_certificate)}"
 
-  openvpn_private_key     = "${module.pki.openvpn_private_key}"
-  openvpn_ca_crt          = "${module.pki.openvpn_ca_crt}"
-  openvpn_certificate_crt = "${module.pki.openvpn_certificate_crt}"
-  openvpn_dh_pem          = "${module.pki.openvpn_dh_pem}"
-  openvpn_ta_key          = "${module.pki.openvpn_ta_key}"
+  openvpn_private_key     = "${base64decode(module.pki.openvpn_private_key)}"
+  openvpn_ca_crt          = "${base64decode(module.pki.openvpn_ca_crt)}"
+  openvpn_certificate_crt = "${base64decode(module.pki.openvpn_certificate_crt)}"
+  openvpn_dh_pem          = "${base64decode(module.pki.openvpn_dh_pem)}"
+  openvpn_ta_key          = "${base64decode(module.pki.openvpn_ta_key)}"
   openvpn_server_url      = "tcp://${var.openvpn_common_name}:443"
 }
