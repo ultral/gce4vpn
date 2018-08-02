@@ -1,6 +1,5 @@
 resource "kubernetes_secret" "openvpn" {
   metadata {
-    app = "openvpn"
     name =  "openvpn-pki"
   }
 

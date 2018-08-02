@@ -1,6 +1,5 @@
-resource "kubernetes_config_map" "example" {
+resource "kubernetes_config_map" "openvpn" {
   metadata {
-    app = "openvpn"
     name = "openvpn-settings"
   }
 

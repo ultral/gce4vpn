@@ -16,8 +16,68 @@ resource "kubernetes_replication_controller" "openvpn" {
         image = "ptlange/openvpn"
         name  = "opevpnsrv"
 
+        security_context {
+          capabilities {
+            add = ["NET_ADMIN"]
+          }
+        }
+
         port {
           container_port = 1194
+        }
+
+        env {
+          name = "PODIPADDR"
+          value_from {
+            field_ref {
+              field_path = "status.podIP"
+            }
+          }
+        }
+        env {
+          name = "OVPN_SERVER_URL"
+          value_from {
+            config_map_key_ref {
+              name = "openvpn-settings"
+              key = "serverurl"
+            }
+          }
+        }
+        env {
+          name = "OVPN_K8S_SERVICE_NETWORK"
+          value_from {
+            config_map_key_ref {
+              name = "openvpn-settings"
+              key = "servicecidr"
+            }
+          }
+        }
+        env {
+          name = "OVPN_K8S_POD_NETWORK"
+          value_from {
+            config_map_key_ref {
+              name = "openvpn-settings"
+              key = "podcidr"
+            }
+          }
+        }
+        env {
+          name = "OVPN_K8S_DOMAIN"
+          value_from {
+            config_map_key_ref {
+              name = "openvpn-settings"
+              key = "domain"
+            }
+          }
+        }
+        env {
+          name = "OVPN_STATUS"
+          value_from {
+            config_map_key_ref {
+              name = "openvpn-settings"
+              key = "statusfile"
+            }
+          }
         }
 
         resources{
@@ -31,9 +91,6 @@ resource "kubernetes_replication_controller" "openvpn" {
           }
         }
 
-        capabilities{
-          add = ["NET_ADMIN"]
-        }
         volume_mount {
           name = "/etc/openvpn/pki"
           mount_path = "openvpn-pki"
@@ -56,9 +113,33 @@ resource "kubernetes_replication_controller" "openvpn" {
         }
       }
       volume {
-        name = "openvpn-persistent-storage"
-        persistent_volume {
-          claim_name = "${kubernetes_persistent_volume.openvpn_data.metadata.0.name}"
+        name = "openvpn-pki"
+        secret {
+            secret_name = "openvpn-pki"
+            default_mode = 0400
+        }
+      }
+      volume {
+        name = "openvpn-status"
+        empty_dir {}
+      }
+      volume {
+        name = "openvpn-portmapping"
+        config_map {
+          name = "openvpn-portmapping"
+        }
+      }
+      volume {
+        name = "openvpn-crl"
+        config_map {
+          name = "openvpn-crl"
+          default_mode = 0555
+        }
+      }
+      volume {
+        name = "openvpn-ccd"
+        config_map {
+          name = "openvpn-ccd"
         }
       }
     }
