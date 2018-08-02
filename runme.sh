@@ -40,7 +40,7 @@ gcloud_setup () {
   read
 
   gcloud alpha billing projects link "${PROJECT_NAME}" --billing-account "${BILLING_ID}"
-  gcloud services enable container.googleapis.com
+  #gcloud services enable container.googleapis.com
   gcloud services enable storage-api.googleapis.com
   gcloud services enable storage-component.googleapis.com
   gsutil mb -p "${PROJECT_NAME}" "gs://${BUCKET_NAME}/"

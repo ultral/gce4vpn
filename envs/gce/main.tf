@@ -1,7 +1,19 @@
+module "gce" {
+  source = "../../modules/gce"
+  project  = "${var.project}"
+  region   = "${var.gce_region}"
+  ip_range = "${var.k8s_service_cidr}"
+}
+
 module "k8s" {
   source = "../../modules/k8s"
-  k8s_admin_username = "${var.k8s_admin_username}"
-  k8s_admin_password = "${var.k8s_admin_password}"
+  k8s_admin_username  = "${var.k8s_admin_username}"
+  k8s_admin_password  = "${var.k8s_admin_password}"
+  k8s_network         = "${module.gce.network_name}"
+  k8s_subnetwork      = "${module.gce.subnet_name}"
+  k8s_cluster_primary_zone = "${var.gce_region}-a"
+  k8s_cluster_slave_zone1  = "${var.gce_region}-b"
+  k8s_cluster_slave_zone2  = "${var.gce_region}-c"
 }
 
 module "pki" {

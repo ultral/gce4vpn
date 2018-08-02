@@ -18,17 +18,14 @@ variable "k8s_admin_password" {
 
 variable "k8s_cluster_primary_zone" {
   description = "Cluster primary zone name."
-  default = "europe-north1-a"
 }
 
 variable "k8s_cluster_slave_zone1" {
   description = "Cluster slave zone name."
-  default = "europe-north1-b"
 }
 
 variable "k8s_cluster_slave_zone2" {
   description = "Cluster slave zone name."
-  default = "europe-north1-c"
 }
 
 variable "node_machine_type" {
@@ -39,4 +36,12 @@ variable "node_machine_type" {
 variable "node_disk_size" {
   description = "Node disk size in GB."
   default = 20
+}
+
+variable "k8s_network" {
+  description = "K8s network."
+}
+
+variable "k8s_subnetwork" {
+  description = "K8s subnetwork."
 }
