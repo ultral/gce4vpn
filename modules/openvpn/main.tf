@@ -101,8 +101,8 @@ resource "kubernetes_service" "openvpn" {
 
     port {
       name        = "https"
-      port        = 1194
-      target_port = 443
+      port        = 443
+      target_port = 1194
     }
 
     type = "LoadBalancer"
