@@ -13,6 +13,7 @@ resource "kubernetes_replication_controller" "openvpn" {
     }
     template {
       container {
+#        image = "ultral/openvpn"
         image = "ptlange/openvpn"
         name  = "opevpnsrv"
 
@@ -24,6 +25,11 @@ resource "kubernetes_replication_controller" "openvpn" {
 
         port {
           container_port = 1194
+        }
+
+        env {
+          name = "OVPN_DEFROUTE"
+          value = 1
         }
 
         env {
