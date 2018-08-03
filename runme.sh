@@ -92,7 +92,7 @@ openvpn_init () {
   OPENVPN_USER="$2"
   OPENVPN_HOST="$3"
 
-  docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.goncharov.xyz:1194 -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn ovpn_initpki
+  docker run --user=$(id -u) -e OVPN_SERVER_URL="tcp://${OPENVPN_HOST}:1194" -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn ovpn_initpki
   docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn easyrsa gen-crl
   docker run --user=$(id -u) -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn easyrsa build-client-full ${OPENVPN_USER} nopass
   docker run --user=$(id -u) -e OVPN_SERVER_URL="tcp://${OPENVPN_HOST}:1194" -v $OPENVPN_DIR:/etc/openvpn:z --rm ptlange/openvpn ovpn_getclient ${OPENVPN_USER} > "${OPENVPN_USER}.ovpn"
