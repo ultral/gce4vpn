@@ -11,6 +11,16 @@ no_proxy   = ENV['no_proxy']
 http_proxy = ENV['http_proxy']
 rsync_excl = ['.git/', '.vagrant/', '.kitchen/', '.terraform/', '.terraform.tfstate.lock', '*.tfstate']
 
+proxy_docker_conf_dir  = '/etc/systemd/system/docker.service.d'
+proxy_docker_conf_path = "#{proxy_docker_conf_dir}/30-proxy.conf"
+proxy_docker_config = <<-HEREDOC
+[Service]
+Environment=HTTP_PROXY=#{http_proxy}
+Environment=HTTPS_PROXY=#{http_proxy}
+Environment=NO_PROXY=#{no_proxy}
+
+HEREDOC
+
 puts "Use http_proxy: '#{http_proxy}'"
 puts "Use no_proxy  : '#{no_proxy}'"
 
@@ -24,15 +34,10 @@ Vagrant.configure('2') do |config|
     config.proxy.https    = http_proxy
     config.proxy.no_proxy = no_proxy
 
-    proxy_docker_conf_dir = '/etc/systemd/system/docker.service.d'
-    proxy_docker_config   = "#{proxy_docker_conf_dir}/30-proxy.conf"
     config.vm.provision 'shell', inline: " \
-      mkdir -p #{proxy_docker_conf_dir} ;\
-      echo '[Service]' > #{proxy_docker_config} ;\
-      echo 'Environment=HTTP_PROXY=#{http_proxy}' >> #{proxy_docker_config} ;\
-      echo 'Environment=HTTPS_PROXY=#{http_proxy} >> #{proxy_docker_config} ;\
-      echo 'Environment=NO_PROXY=#{no_proxy}' >> #{proxy_docker_config} ;\
-      echo >> #{proxy_docker_config}"
+      echo '#{proxy_docker_config}' > /home/vagrant/docker.tmp ;\
+      sudo mkdir -p #{proxy_docker_conf_dir} ;\
+      sudo cp /home/vagrant/docker.tmp #{proxy_docker_conf_path}"
   end
 
   config.vm.synced_folder '.', '/vagrant', type: 'rsync', rsync__exclude: rsync_excl

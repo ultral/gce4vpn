@@ -11,19 +11,19 @@ module "k8s" {
   k8s_admin_password  = "${var.k8s_admin_password}"
   k8s_network         = "${module.gce.network_name}"
   k8s_subnetwork      = "${module.gce.subnet_name}"
-  k8s_cluster_primary_zone = "${var.gce_region}-a"
-  k8s_cluster_slave_zone1  = "${var.gce_region}-b"
-  k8s_cluster_slave_zone2  = "${var.gce_region}-c"
+  k8s_cluster_primary_zone = "${module.gce.zone_primary}"
+  k8s_cluster_slave_zone1  = "${module.gce.zone_slave1}"
+  k8s_cluster_slave_zone2  = "${module.gce.zone_slave2}"
 }
 
 module "pki" {
   source = "../../modules/pki"
 
-  openvpn_file_private_key      = "${var.openvpn_file_private_key}"
-  openvpn_file_ca_crt           = "${var.openvpn_file_ca_crt}"
-  openvpn_file_certificate_crt  = "${var.openvpn_file_certificate_crt}"
-  openvpn_file_dh_pem           = "${var.openvpn_file_dh_pem}"
-  openvpn_file_ta_key           = "${var.openvpn_file_ta_key}"
+  openvpn_file_private_key      = "${var.openvpn_files}/pki/private/vpn.some.domain.key"
+  openvpn_file_ca_crt           = "${var.openvpn_files}/pki/ca.crt"
+  openvpn_file_certificate_crt  = "${var.openvpn_files}/pki/issued/vpn.some.domain.crt"
+  openvpn_file_dh_pem           = "${var.openvpn_files}/pki/dh.pem"
+  openvpn_file_ta_key           = "${var.openvpn_files}/pki/ta.key"
 }
 
 module "openvpn" {
@@ -42,5 +42,5 @@ module "openvpn" {
   openvpn_certificate_crt = "${base64decode(module.pki.openvpn_certificate_crt)}"
   openvpn_dh_pem          = "${base64decode(module.pki.openvpn_dh_pem)}"
   openvpn_ta_key          = "${base64decode(module.pki.openvpn_ta_key)}"
-  openvpn_server_url      = "tcp://${var.openvpn_common_name}:443"
+  openvpn_server_url      = "tcp://${var.openvpn_cn}:443"
 }

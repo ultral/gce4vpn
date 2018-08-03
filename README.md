@@ -6,15 +6,7 @@ VM for managing VPN in GCE
 ```
 $ vagrant up
 $ vagrant ssh
-
-$ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.goncharov.xyz:1194 -v $PWD:/etc/openvpn:z -ti ptlange/openvpn ovpn_initpki
-$ docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $PWD:/etc/openvpn:z -ti ptlange/openvpn easyrsa gen-crl
-
-$ runme.sh --gcloud-init --terraform-apply --project-id gce4vpn6
-
-$ docker run --user=$(id -u) -v $PWD:/etc/openvpn:z -ti ptlange/openvpn easyrsa build-client-full lev nopass
-$ docker run --user=$(id -u) -e OVPN_SERVER_URL=tcp://vpn.goncharov.xyz:1194 -v $PWD:/etc/openvpn:z --rm ptlange/openvpn ovpn_getclient lev > lev.ovpn
-
+$ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init
 ```
 
 # Start
@@ -62,8 +54,9 @@ terraform apply
 
 
 # Credits
+I used code from zambien's and kylemanna's openvpn repos in this work:
 [pieterlange/kube-openvpn](https://github.com/pieterlange/kube-openvpn)
-[terraform-gcp-gke-openvpn]https://github.com/zambien/terraform-gcp-gke-openvpn
+[zambien/terraform-gcp-gke-openvpn]https://github.com/zambien/terraform-gcp-gke-openvpn
 
 ## FIX
 ```

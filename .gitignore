@@ -8,4 +8,3 @@
 *.tfstate.backup
 *.tfvars
 .key.json
-.project.name

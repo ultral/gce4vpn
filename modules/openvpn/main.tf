@@ -13,7 +13,6 @@ resource "kubernetes_replication_controller" "openvpn" {
     }
     template {
       container {
-#        image = "ultral/openvpn"
         image = "ptlange/openvpn"
         name  = "opevpnsrv"
 

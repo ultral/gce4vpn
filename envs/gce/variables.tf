@@ -1,8 +1,3 @@
-variable "google_primary_zone" {
-  description = "Primary zone."
-  default = "europe-north1-a"
-}
-
 variable "k8s_admin_username" {
   description = "K8s admin username."
 }
@@ -15,32 +10,12 @@ variable "project" {
   description = "Project name in google cloud."
 }
 
-variable "openvpn_common_name" {
+variable "openvpn_cn" {
   description = "Your vpn server domain name."
 }
 
-variable "openvpn_file_private_key" {
-  description = "Path to your private.key file."
-}
-
-variable "openvpn_file_ca_crt" {
-  description = "Path to your ca.crt file."
-}
-
-variable "openvpn_file_certificate_crt" {
-  description = "Path to your certificate.crt file."
-}
-
-variable "openvpn_file_dh_pem" {
-  description = "Path to your dh.pem file."
-}
-
-variable "openvpn_file_ta_key" {
-  description = "Path to your ta.key file."
-}
-
-variable "k8s_service_cidr" {
-  description = "gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep servicesIpv4Cidr"
+variable "openvpn_files" {
+  description = "Path to your openvpn config files directory."
 }
 
 variable "k8s_pod_cidr" {
@@ -48,6 +23,6 @@ variable "k8s_pod_cidr" {
 }
 
 variable "gce_region" {
-  description = "Cluster primary zone name."
+  description = "Cluster region name."
   default = "europe-north1"
 }

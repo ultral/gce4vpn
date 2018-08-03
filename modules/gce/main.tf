@@ -3,15 +3,17 @@ resource "google_project_services" "openvpn_project" {
 
   services = [
     "iam.googleapis.com",
+    "compute.googleapis.com",
     "compute-component.googleapis.com",
     "container.googleapis.com",
     "servicemanagement.googleapis.com",
     "cloudresourcemanager.googleapis.com",
     "storage-api.googleapis.com",
+    "serviceusage.googleapis.com",
+    "oslogin.googleapis.com",
     "dns.googleapis.com"
   ]
 }
-
 
 resource "google_compute_network" "openvpn_network" {
   name                    = "${var.prefix}-network"
