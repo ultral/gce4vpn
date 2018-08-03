@@ -33,7 +33,7 @@
 - name: adding vagrant user '{{ user }}' to group docker
   user:
     name: '{{ user }}'
-    groups: sudo
+    groups: docker
     append: yes
 
 - name: enable docker

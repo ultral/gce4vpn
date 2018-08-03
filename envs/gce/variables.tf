@@ -22,6 +22,10 @@ variable "k8s_pod_cidr" {
   description = "gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep clusterIpv4Cidr"
 }
 
+variable "k8s_service_cidr" {
+  description = "Service CIDR."
+}
+
 variable "gce_region" {
   description = "Cluster region name."
   default = "europe-north1"

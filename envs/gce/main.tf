@@ -19,9 +19,9 @@ module "k8s" {
 module "pki" {
   source = "../../modules/pki"
 
-  openvpn_file_private_key      = "${var.openvpn_files}/pki/private/vpn.some.domain.key"
+  openvpn_file_private_key      = "${var.openvpn_files}/pki/private/${var.openvpn_cn}.key"
   openvpn_file_ca_crt           = "${var.openvpn_files}/pki/ca.crt"
-  openvpn_file_certificate_crt  = "${var.openvpn_files}/pki/issued/vpn.some.domain.crt"
+  openvpn_file_certificate_crt  = "${var.openvpn_files}/pki/issued/${var.openvpn_cn}.crt"
   openvpn_file_dh_pem           = "${var.openvpn_files}/pki/dh.pem"
   openvpn_file_ta_key           = "${var.openvpn_files}/pki/ta.key"
 }
