@@ -104,6 +104,8 @@ openvpn_getclient () {
   docker run --user=$(id -u) \
     -e OVPN_ADDR="${OPENVPN_HOST}" \
     -e OVPN_PORT="${OPENVPN_PORT}" \
+    -e OVPN_PROTO="tcp" \
+    -e OVPN_CLIENT_PROXY="$(echo $http_proxy|cut -f3 -d/|cut -f1 -d: )" \
     -v $OPENVPN_DIR:/etc/openvpn:z \
     --rm ultral/openvpn \
     ovpn_getclient ${OPENVPN_USER} > "${OPENVPN_USER}.ovpn"
@@ -116,6 +118,7 @@ while [ "$1" != "" ] ; do
     -c|--openvpn-config) OPENVPN_CONFIG='YES' ;;
     -t|--terraform-apply) TERRAFORM_APPLY='YES' ;;
     -d|--terraform-destroy) TERRAFORM_DESTROY='YES' ;;
+    -u|--user) USER_NAME="$2" ; shift ;;
     -h|--help) usage ;;
   esac
   shift
@@ -125,6 +128,7 @@ done
 [ -z "${OPENVPN_INIT}" ] && OPENVPN_INIT='NO'
 [ -z "${TERRAFORM_APPLY}" ] && TERRAFORM_APPLY='NO'
 [ -z "${TERRAFORM_DESTROY}" ] && TERRAFORM_DESTROY='NO'
+
 
 [ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}"
 [ "_${OPENVPN_INIT}" = "_YES" ] && openvpn_initpki "${OPENVPN_DIR}" "${DOMAIN_NAME}"
