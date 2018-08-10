@@ -4,6 +4,7 @@ MAINTAINER Lev Goncharov <lev@goncharov.xyz>
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/community/" >> /etc/apk/repositories && \
     echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
+    apk add --update openssl && \
     apk add --update openvpn \
       bash libintl inotify-tools openvpn-auth-pam pamtester && \
     apk add --virtual temppkg gettext &&  \
