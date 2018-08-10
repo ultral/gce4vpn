@@ -5,8 +5,7 @@ CURPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLAN_DIR="${CURPATH}/envs/gce"
 OPENVPN_DIR="/home/vagrant"
 USER_NAME='lev'
-PROJECT_ID=$(tr -d " \t" < "${PLAN_DIR}/config_backend.tfvars"| grep "^project=" | cut -f 2 -d "=" | tr -d "\n\r\"")
-BUCKET_NAME=$(tr -d " \t" < "${PLAN_DIR}/config_backend.tfvars"| grep "^bucket=" | cut -f 2 -d "=" | tr -d "\n\r\"")
+PROJECT_ID=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^project=" | cut -f 2 -d "=" | tr -d "\n\r\"")
 DOMAIN_NAME=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^openvpn_cn=" | cut -f 2 -d "=" | tr -d "\n\r\"")
 
 usage () {
@@ -17,10 +16,8 @@ usage () {
 gcloud_setup () {
   local PROJECT_NAME
   local BILLING_ID
-  local BUCKET_NAME
   local CRED_URL
   PROJECT_NAME="$1"
-  BUCKET_NAME="$2"
   CRED_URL="https://console.developers.google.com/apis/credentials?project=${PROJECT_NAME}"
 
   echo "Project: ${PROJECT_NAME}"
@@ -46,62 +43,77 @@ gcloud_setup () {
   gcloud alpha billing projects link "${PROJECT_NAME}" --billing-account "${BILLING_ID}"
   gcloud services enable container.googleapis.com
   gcloud services enable serviceusage.googleapis.com
-  gcloud services enable storage-api.googleapis.com
-  gcloud services enable storage-component.googleapis.com
-  gsutil mb -p "${PROJECT_NAME}" "gs://${BUCKET_NAME}/"
 }
 
 terraform_run () {
   local PLAN_DIR
-  local GOOGLE_CREDS
   PLAN_DIR="$1"
-  GOOGLE_CREDS=$(cat "${PLAN_DIR}/.key.json")
 
   echo "Run terraform from '${PLAN_DIR}'"
 
-  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform init \
-    -backend-config="${PLAN_DIR}/config_backend.tfvars" \
-    "${PLAN_DIR}"
-  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform plan \
+  terraform init "${PLAN_DIR}"
+  terraform plan \
     -var-file="${PLAN_DIR}/config_secrets.tfvars" \
-    -var-file="${PLAN_DIR}/config_backend.tfvars" \
     "${PLAN_DIR}"
-  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform apply \
+  terraform apply \
     -var-file="${PLAN_DIR}/config_secrets.tfvars" \
-    -var-file="${PLAN_DIR}/config_backend.tfvars" \
     "${PLAN_DIR}"
 }
 
 terraform_destroy () {
   local PLAN_DIR
-  local GOOGLE_CREDS
   PLAN_DIR="$1"
-  GOOGLE_CREDS=$(cat "${PLAN_DIR}/.key.json")
 
-  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform destroy  \
+  terraform destroy  \
     -var-file="${PLAN_DIR}/config_secrets.tfvars" \
-    -var-file="${PLAN_DIR}/config_backend.tfvars" \
     "${PLAN_DIR}"
 }
 
-openvpn_init () {
+openvpn_initpki () {
+  local OPENVPN_DIR
+  local OPENVPN_HOST
+  OPENVPN_DIR="$1"
+  OPENVPN_HOST="$2"
+
+  docker run --user=$(id -u) \
+    -e OVPN_SERVER_URL="tcp://${OPENVPN_HOST}:443" \
+    -v $OPENVPN_DIR:/etc/openvpn:z \
+    -ti ptlange/openvpn ovpn_initpki
+
+  docker run --user=$(id -u) \
+    -e EASYRSA_CRL_DAYS=180 \
+    -v $OPENVPN_DIR:/etc/openvpn:z \
+    -ti ptlange/openvpn easyrsa gen-crl
+}
+
+openvpn_getclient () {
   local OPENVPN_DIR
   local OPENVPN_USER
   local OPENVPN_HOST
+  local OPENVPN_PORT
   OPENVPN_DIR="$1"
   OPENVPN_USER="$2"
   OPENVPN_HOST="$3"
+  OPENVPN_PORT="$4"
 
-  docker run --user=$(id -u) -e OVPN_SERVER_URL="tcp://${OPENVPN_HOST}:1194" -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn ovpn_initpki
-  docker run --user=$(id -u) -e EASYRSA_CRL_DAYS=180 -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn easyrsa gen-crl
-  docker run --user=$(id -u) -v $OPENVPN_DIR:/etc/openvpn:z -ti ptlange/openvpn easyrsa build-client-full ${OPENVPN_USER} nopass
-  docker run --user=$(id -u) -e OVPN_SERVER_URL="tcp://${OPENVPN_HOST}:1194" -v $OPENVPN_DIR:/etc/openvpn:z --rm ptlange/openvpn ovpn_getclient ${OPENVPN_USER} > "${OPENVPN_USER}.ovpn"
+  docker run --user=$(id -u) \
+    -v $OPENVPN_DIR:/etc/openvpn:z \
+    -ti ptlange/openvpn \
+    easyrsa build-client-full ${OPENVPN_USER} nopass
+
+  docker run --user=$(id -u) \
+    -e OVPN_ADDR="${OPENVPN_HOST}" \
+    -e OVPN_PORT="${OPENVPN_PORT}" \
+    -v $OPENVPN_DIR:/etc/openvpn:z \
+    --rm ultral/openvpn \
+    ovpn_getclient ${OPENVPN_USER} > "${OPENVPN_USER}.ovpn"
 }
 
 while [ "$1" != "" ] ; do
   case "$1" in
     -g|--gcloud-init) GCLOUD_INIT='YES' ;;
     -o|--openvpn-init) OPENVPN_INIT='YES' ;;
+    -c|--openvpn-config) OPENVPN_CONFIG='YES' ;;
     -t|--terraform-apply) TERRAFORM_APPLY='YES' ;;
     -d|--terraform-destroy) TERRAFORM_DESTROY='YES' ;;
     -h|--help) usage ;;
@@ -114,7 +126,13 @@ done
 [ -z "${TERRAFORM_APPLY}" ] && TERRAFORM_APPLY='NO'
 [ -z "${TERRAFORM_DESTROY}" ] && TERRAFORM_DESTROY='NO'
 
-[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}" "${BUCKET_NAME}"
-[ "_${OPENVPN_INIT}" = "_YES" ] && openvpn_init "${OPENVPN_DIR}" "${USER_NAME}" "${DOMAIN_NAME}"
+[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}"
+[ "_${OPENVPN_INIT}" = "_YES" ] && openvpn_initpki "${OPENVPN_DIR}" "${DOMAIN_NAME}"
 [ "_${TERRAFORM_APPLY}" = "_YES" ] && terraform_run "${PLAN_DIR}"
 [ "_${TERRAFORM_DESTROY}" = "_YES" ] && terraform_destroy "${PLAN_DIR}"
+
+if [ "_${OPENVPN_CONFIG}" = "_YES" ] ; then
+  VPN_ADDR=$(terraform output vpn_server_addr)
+  VPN_PORT=$(terraform output vpn_server_port)
+  openvpn_getclient "${OPENVPN_DIR}" "${USER_NAME}" "${VPN_ADDR}" "${VPN_PORT}"
+fi

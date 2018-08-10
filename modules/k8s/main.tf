@@ -4,8 +4,6 @@ resource "google_container_cluster" "gcp_vpn" {
   zone               = "${var.k8s_cluster_primary_zone}"
   enable_legacy_abac = "true"
   initial_node_count = "${var.k8s_nodes_count}"
-  network            = "${var.k8s_network}"
-  subnetwork         = "${var.k8s_subnetwork}"
 
   additional_zones = [
     "${var.k8s_cluster_slave_zone1}",

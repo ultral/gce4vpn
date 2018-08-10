@@ -37,11 +37,3 @@ variable "node_disk_size" {
   description = "Node disk size in GB."
   default = 20
 }
-
-variable "k8s_network" {
-  description = "K8s network."
-}
-
-variable "k8s_subnetwork" {
-  description = "K8s subnetwork."
-}

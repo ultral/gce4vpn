@@ -60,13 +60,12 @@ I used code from zambien's and kylemanna's openvpn repos in this work:
 
 ## FIX
 ```
+$ docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_proxy --no-cache  -t openvpn .
 $ gcloud container clusters get-credentials gce4vpn-k8s --zone europe-north1-a
 
 $ kubectl get pods
 
-$ gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a| grep servicesIpv4Cidr
-servicesIpv4Cidr: 10.55.240.0/20
+#standard_init_linux.go:190: exec user process caused "no such file or directory"
 
-$ gcloud container clusters describe gce4vpn-k8s --zone europe-north1-a | grep clusterIpv4Cidr
-clusterIpv4Cidr: 10.52.0.0/14
+
 ```

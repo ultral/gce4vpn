@@ -13,7 +13,7 @@ resource "kubernetes_replication_controller" "openvpn" {
     }
     template {
       container {
-        image = "ptlange/openvpn"
+        image = "ultral/openvpn"
         name  = "opevpnsrv"
 
         security_context {
@@ -27,42 +27,10 @@ resource "kubernetes_replication_controller" "openvpn" {
         }
 
         env {
-          name = "OVPN_DEFROUTE"
-          value = 1
-        }
-
-        env {
           name = "PODIPADDR"
           value_from {
             field_ref {
               field_path = "status.podIP"
-            }
-          }
-        }
-        env {
-          name = "OVPN_SERVER_URL"
-          value_from {
-            config_map_key_ref {
-              name = "openvpn-settings"
-              key = "serverurl"
-            }
-          }
-        }
-        env {
-          name = "OVPN_K8S_SERVICE_NETWORK"
-          value_from {
-            config_map_key_ref {
-              name = "openvpn-settings"
-              key = "servicecidr"
-            }
-          }
-        }
-        env {
-          name = "OVPN_K8S_POD_NETWORK"
-          value_from {
-            config_map_key_ref {
-              name = "openvpn-settings"
-              key = "podcidr"
             }
           }
         }
@@ -106,7 +74,7 @@ resource "kubernetes_service" "openvpn" {
 
     port {
       name        = "https"
-      port        = 443
+      port        = "${var.openvpn_publish_port}"
       target_port = 1194
     }
 

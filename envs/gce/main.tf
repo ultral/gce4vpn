@@ -1,19 +1,10 @@
-module "gce" {
-  source = "../../modules/gce"
-  project  = "${var.project}"
-  region   = "${var.gce_region}"
-  ip_range = "${var.k8s_service_cidr}"
-}
-
 module "k8s" {
   source = "../../modules/k8s"
   k8s_admin_username  = "${var.k8s_admin_username}"
   k8s_admin_password  = "${var.k8s_admin_password}"
-  k8s_network         = "${module.gce.network_name}"
-  k8s_subnetwork      = "${module.gce.subnet_name}"
-  k8s_cluster_primary_zone = "${module.gce.zone_primary}"
-  k8s_cluster_slave_zone1  = "${module.gce.zone_slave1}"
-  k8s_cluster_slave_zone2  = "${module.gce.zone_slave2}"
+  k8s_cluster_primary_zone = "${var.gce_region}-a"
+  k8s_cluster_slave_zone1  = "${var.gce_region}-b"
+  k8s_cluster_slave_zone2  = "${var.gce_region}-c"
 }
 
 module "pki" {
@@ -31,8 +22,6 @@ module "openvpn" {
   k8s_admin_username = "${var.k8s_admin_username}"
   k8s_admin_password = "${var.k8s_admin_password}"
   k8s_admin_url      = "${module.k8s.k8s_admin_url}"
-  k8s_service_cidr   = "${var.k8s_service_cidr}"
-  k8s_pod_cidr       = "${var.k8s_pod_cidr}"
   k8s_client_cert             = "${base64decode(module.k8s.client_certificate)}"
   k8s_client_key              = "${base64decode(module.k8s.client_key)}"
   k8s_cluster_ca_certificate  = "${base64decode(module.k8s.cluster_ca_certificate)}"
@@ -42,5 +31,5 @@ module "openvpn" {
   openvpn_certificate_crt = "${base64decode(module.pki.openvpn_certificate_crt)}"
   openvpn_dh_pem          = "${base64decode(module.pki.openvpn_dh_pem)}"
   openvpn_ta_key          = "${base64decode(module.pki.openvpn_ta_key)}"
-  openvpn_server_url      = "tcp://${var.openvpn_cn}:443"
+  openvpn_publish_port    = 443
 }
