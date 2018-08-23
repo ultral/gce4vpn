@@ -56,11 +56,11 @@ terraform apply
 # Credits
 I used code from zambien's and kylemanna's openvpn repos in this work:
 [pieterlange/kube-openvpn](https://github.com/pieterlange/kube-openvpn)
-[zambien/terraform-gcp-gke-openvpn]https://github.com/zambien/terraform-gcp-gke-openvpn
+[zambien/terraform-gcp-gke-openvpn](https://github.com/zambien/terraform-gcp-gke-openvpn)
 
 ## FIX
 ```
-$ docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_proxy --no-cache  -t openvpn .
+$ docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_proxy --no-cache  -t ultral/openvpn .
 $ gcloud container clusters get-credentials gce4vpn-k8s --zone europe-north1-a
 
 $ kubectl get pods
