@@ -1,3 +1,9 @@
+module "gcp4tfstate" {
+  source = "../../modules/gcp4tfstate"
+  tfstate_region = "${var.gce_region}"
+  tfstate_bucket = "${var.tfstate_bucket}"
+}
+
 module "k8s" {
   source = "../../modules/k8s"
   k8s_admin_username  = "${var.k8s_admin_username}"

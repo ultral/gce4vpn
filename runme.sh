@@ -26,12 +26,25 @@ USER_NAME='lev'
 PROJECT_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "project")
 DOMAIN_NAME=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "openvpn_cn")
 BILLING_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "google_billing_id")
-IAM=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "service_account")
+SERVICE_ACCOUNT=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "service_account")
 #gcloud alpha billing accounts list |grep True|head -n1|cut -f1 -d" "
+IAM="${SERVICE_ACCOUNT}@${PROJECT_ID}.iam.gserviceaccount.com"
 
 usage () {
   echo "Usage: $0 [--gcloud-init] [--terraform-apply] [--terraform-destroy] [--help]"
   echo ""
+}
+
+gcloud_get_key () {
+  local SECRET_KEY_PATH
+  local IAM
+  IAM="$1"
+  SECRET_KEY_PATH="$2"
+
+  log_message "Create keys for '${IAM}'"
+  gcloud iam service-accounts keys create \
+    --iam-account "${IAM}" \
+    "${SECRET_KEY_PATH}"
 }
 
 gcloud_setup () {
@@ -39,12 +52,12 @@ gcloud_setup () {
   local BILLING_ID
   local IAM
   local SERVICE_ACCOUNT
-  local SECRET_KEY_PATH
+
 
   PROJECT_NAME="$1"
   BILLING_ID="$2"
   SERVICE_ACCOUNT="$3"
-  SECRET_KEY_PATH="$4"
+
   IAM="${SERVICE_ACCOUNT}@${PROJECT_NAME}.iam.gserviceaccount.com"
 
   log_message "Init project: '${PROJECT_NAME}'"
@@ -58,19 +71,19 @@ gcloud_setup () {
   log_message "Create service account '${SERVICE_ACCOUNT}'"
   gcloud iam service-accounts create "${SERVICE_ACCOUNT}"
 
-  log_message "Create keys for '${IAM}'"
-  gcloud iam service-accounts keys create \
-    --iam-account "${IAM}" \
-    "${SECRET_KEY_PATH}"
-
   log_message "Grant owner permissions for '${IAM}' to '${PROJECT_NAME}'"
   gcloud projects add-iam-policy-binding "${PROJECT_NAME}" \
     --member "serviceAccount:${IAM}" \
     --role roles/owner
+  gcloud projects add-iam-policy-binding "${PROJECT_NAME}" \
+    --member="serviceAccount:${IAM}" \
+    --role='roles/servicemanagement.admin'
 
   log_message "Enable API"
-  gcloud services enable container.googleapis.com
   gcloud services enable serviceusage.googleapis.com
+  gcloud services enable container.googleapis.com
+  gcloud services enable storage-api.googleapis.com
+  gcloud services enable storage-component.googleapis.com
 }
 
 terraform_run () {
@@ -78,6 +91,23 @@ terraform_run () {
   PLAN_DIR="$1"
 
   log_message "Run terraform from '${PLAN_DIR}'"
+
+#  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform plan \
+#  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform init \
+#    -backend-config="${PLAN_DIR}/config_backend.tfvars" \
+#    "${PLAN_DIR}"
+#  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform plan \
+#  terraform init "${PLAN_DIR}"
+#  terraform plan \
+#    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
+#    -var-file="${PLAN_DIR}/config_backend.tfvars" \
+#    "${PLAN_DIR}"
+#  GOOGLE_CREDENTIALS="${GOOGLE_CREDS}" terraform apply \
+#  terraform apply \
+#    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
+#    -var-file="${PLAN_DIR}/config_backend.tfvars" \
+#    "${PLAN_DIR}"
+
 
   terraform init "${PLAN_DIR}"
   terraform plan \
@@ -142,6 +172,7 @@ openvpn_getclient () {
 while [ "$1" != "" ] ; do
   case "$1" in
     -g|--gcloud-init) GCLOUD_INIT='YES' ;;
+    -k|--get-google-key) GCLOUD_GET_KEY='YES' ;;
     -o|--openvpn-init) OPENVPN_INIT='YES' ;;
     -c|--openvpn-config) OPENVPN_CONFIG='YES' ;;
     -t|--terraform-apply) TERRAFORM_APPLY='YES' ;;
@@ -156,9 +187,10 @@ done
 [ -z "${OPENVPN_INIT}" ] && OPENVPN_INIT='NO'
 [ -z "${TERRAFORM_APPLY}" ] && TERRAFORM_APPLY='NO'
 [ -z "${TERRAFORM_DESTROY}" ] && TERRAFORM_DESTROY='NO'
+[ -z "${GCLOUD_GET_KEY}" ] && GCLOUD_GET_KEY='NO'
 
-
-[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}" "${BILLING_ID}" "${IAM}" "${KEY_PATH}"
+[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}" "${BILLING_ID}" "${SERVICE_ACCOUNT}"
+[ "_${GCLOUD_GET_KEY}" = "_YES" ] && gcloud_get_key "${IAM}" "${KEY_PATH}"
 [ "_${OPENVPN_INIT}" = "_YES" ] && openvpn_initpki "${OPENVPN_DIR}" "${DOMAIN_NAME}"
 [ "_${TERRAFORM_APPLY}" = "_YES" ] && terraform_run "${PLAN_DIR}"
 [ "_${TERRAFORM_DESTROY}" = "_YES" ] && terraform_destroy "${PLAN_DIR}"
