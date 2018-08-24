@@ -1,12 +1,33 @@
 #!/bin/bash
 set -e
 
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
+function log_message() {
+  echo -e "$(date +"%Y-%m-%d %H:%M:%S"): ${GREEN} $* ${NC}"
+}
+
+function get_value() {
+  local CONFIG_PATH
+  local VALUE_NAME
+
+  CONFIG_PATH="$1"
+  VALUE_NAME="$2"
+  tr -d " \t" < "${CONFIG_PATH}"| grep "^${VALUE_NAME}=" | cut -f 2 -d "=" | tr -d "\n\r\""
+}
+
 CURPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLAN_DIR="${CURPATH}/envs/gce"
+KEY_PATH="${PLAN_DIR}/.key.json"
 OPENVPN_DIR="/home/vagrant"
 USER_NAME='lev'
-PROJECT_ID=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^project=" | cut -f 2 -d "=" | tr -d "\n\r\"")
-DOMAIN_NAME=$(tr -d " \t" < "${PLAN_DIR}/config_secrets.tfvars"| grep "^openvpn_cn=" | cut -f 2 -d "=" | tr -d "\n\r\"")
+PROJECT_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "project")
+DOMAIN_NAME=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "openvpn_cn")
+BILLING_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "google_billing_id")
+IAM=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "service_account")
+#gcloud alpha billing accounts list |grep True|head -n1|cut -f1 -d" "
 
 usage () {
   echo "Usage: $0 [--gcloud-init] [--terraform-apply] [--terraform-destroy] [--help]"
@@ -16,31 +37,38 @@ usage () {
 gcloud_setup () {
   local PROJECT_NAME
   local BILLING_ID
-  local CRED_URL
+  local IAM
+  local SERVICE_ACCOUNT
+  local SECRET_KEY_PATH
+
   PROJECT_NAME="$1"
-  CRED_URL="https://console.developers.google.com/apis/credentials?project=${PROJECT_NAME}"
+  BILLING_ID="$2"
+  SERVICE_ACCOUNT="$3"
+  SECRET_KEY_PATH="$4"
+  IAM="${SERVICE_ACCOUNT}@${PROJECT_NAME}.iam.gserviceaccount.com"
 
-  echo "Project: ${PROJECT_NAME}"
-  echo "Bucket:  ${BUCKET_NAME}"
-
+  log_message "Init project: '${PROJECT_NAME}'"
   gcloud init --project "${PROJECT_NAME}"
-  echo ""
-  echo "!!!!!!!!!!!!!!!!!!!!!!!"
-  echo ""
-  echo "Please visit: ${CRED_URL} and save key as 'envs/gce/.key.json'"
-  echo "${CRED_URL}"
-  echo ""
-  echo "!!!!!!!!!!!!!!!!!!!!!!!"
-  echo ""
-  echo "After that press Enter"
-  read
 
-  BILLING_ID=$(gcloud alpha billing accounts list |grep True|head -n1|cut -f1 -d" ")
-  echo "Please check your billing ID '${BILLING_ID}'"
-  echo "After that press Enter"
-  read
-
+  log_message "Link billig account '${BILLING_ID}' to project '${PROJECT_NAME}'"
+  gcloud projects list
+  gcloud alpha billing accounts list
   gcloud alpha billing projects link "${PROJECT_NAME}" --billing-account "${BILLING_ID}"
+
+  log_message "Create service account '${SERVICE_ACCOUNT}'"
+  gcloud iam service-accounts create "${SERVICE_ACCOUNT}"
+
+  log_message "Create keys for '${IAM}'"
+  gcloud iam service-accounts keys create \
+    --iam-account "${IAM}" \
+    "${SECRET_KEY_PATH}"
+
+  log_message "Grant owner permissions for '${IAM}' to '${PROJECT_NAME}'"
+  gcloud projects add-iam-policy-binding "${PROJECT_NAME}" \
+    --member "serviceAccount:${IAM}" \
+    --role roles/owner
+
+  log_message "Enable API"
   gcloud services enable container.googleapis.com
   gcloud services enable serviceusage.googleapis.com
 }
@@ -49,7 +77,7 @@ terraform_run () {
   local PLAN_DIR
   PLAN_DIR="$1"
 
-  echo "Run terraform from '${PLAN_DIR}'"
+  log_message "Run terraform from '${PLAN_DIR}'"
 
   terraform init "${PLAN_DIR}"
   terraform plan \
@@ -130,7 +158,7 @@ done
 [ -z "${TERRAFORM_DESTROY}" ] && TERRAFORM_DESTROY='NO'
 
 
-[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}"
+[ "_${GCLOUD_INIT}" = "_YES" ] && gcloud_setup "${PROJECT_ID}" "${BILLING_ID}" "${IAM}" "${KEY_PATH}"
 [ "_${OPENVPN_INIT}" = "_YES" ] && openvpn_initpki "${OPENVPN_DIR}" "${DOMAIN_NAME}"
 [ "_${TERRAFORM_APPLY}" = "_YES" ] && terraform_run "${PLAN_DIR}"
 [ "_${TERRAFORM_DESTROY}" = "_YES" ] && terraform_destroy "${PLAN_DIR}"

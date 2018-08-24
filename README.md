@@ -6,7 +6,7 @@ VM for managing VPN in GCE
 ```
 $ vagrant up
 $ vagrant ssh
-$ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init
+$ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config
 ```
 
 # Start
