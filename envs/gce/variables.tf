@@ -27,7 +27,3 @@ variable "openvpn_publish_port" {
   description = "Openvpn port."
   default = 443
 }
-
-variable "tfstate_bucket" {
-  description = "Terraform state bucket."
-}
