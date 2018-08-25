@@ -13,7 +13,6 @@ key-direction 0
 keepalive 10 60
 persist-key
 persist-tun
-push "block-outside-dns"
 
 proto ${OVPN_PROTO}
 cipher ${OVPN_CIPHER}
@@ -24,5 +23,3 @@ dev tun0
 
 user nobody
 group nogroup
-
-redirect-gateway def1

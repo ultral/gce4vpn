@@ -13,7 +13,7 @@ resource "kubernetes_replication_controller" "openvpn" {
     }
     template {
       container {
-        image = "ultral/openvpn"
+        image = "ultral/openvpn:20180825v2"
         name  = "opevpnsrv"
 
         security_context {

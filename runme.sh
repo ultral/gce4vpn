@@ -42,7 +42,7 @@ DOMAIN_NAME=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "openvpn_cn")
 BILLING_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "google_billing_id")
 
 # Service account login name in google cloud
-GACCOUNT=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "service_account")
+SERVICE_ACCOUNT='terraform'
 
 # IAM email address in google cloud
 IAM="${SERVICE_ACCOUNT}@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -103,6 +103,7 @@ usage () {
   echo "-c|--openvpn-config    - Generate openvpn client config"
   echo "-t|--terraform-apply   - Initialize terraform & apply configuration"
   echo "-d|--terraform-destroy - Destroy configuration"
+  echo "-r|--remove            - Cleanup VM: remove local state, google auth"
   echo "-u|--user              - Set openvpn client name"
   echo "-h|--help              - print this help"
   echo ""
@@ -348,6 +349,26 @@ openvpn_getclient () {
 }
 
 ###############################################################################
+# Func:   cleanup
+# Note:   Cleanup VM: remove local state, google auth
+# Input:  plan_dir pki_dir
+# Output: --
+###############################################################################
+function cleanup() {
+  local PLAN_DIR
+  local OPENVPN_DIR
+  PLAN_DIR="$1"
+  OPENVPN_DIR="$2"
+  log_message --wait --text "Cleanup vm"
+  rm -rvf "${PLAN_DIR}/.key.json"
+  rm -rvf .terraform*
+  rm -rvf terraform.tfstate
+  rm -rvf ~/.gcloud/
+  rm -rvf ~/.config/gcloud/
+  rm -rvf "${OPENVPN_DIR}/pki/"
+  rm -rvf "${OPENVPN_DIR}/*.ovpn"
+}
+###############################################################################
 #
 # Parse script params
 #
@@ -361,6 +382,7 @@ while [ "$1" != "" ] ; do
     -c|--openvpn-config) OPENVPN_CONFIG='YES' ;;
     -t|--terraform-apply) TERRAFORM_APPLY='YES' ;;
     -d|--terraform-destroy) TERRAFORM_DESTROY='YES' ;;
+    -r|--remove) CLEANUP='YES' ;;
     -u|--user) USER_NAME="$2" ; shift ;;
     -h|--help) usage ;;
   esac
@@ -373,11 +395,14 @@ done
 #
 ###############################################################################
 
+[[ "${CLEANUP}" = "YES" ]] && \
+  cleanup "${PLAN_DIR}" "${PKI_DIR}"
+
 [[ "${GCLOUD_INIT}" = "YES" ]] && \
   gcloud_init "${PROJECT_ID}" "${BILLING_ID}"
 
 [[ "${GCLOUD_NEW_ACCOUNT}" = "YES" ]] && \
-  gcloud_new_account "${PROJECT_ID}" "${GACCOUNT}" "${IAM}"
+  gcloud_new_account "${PROJECT_ID}" "${SERVICE_ACCOUNT}" "${IAM}"
 
 [[ "${GCLOUD_GET_KEY}" = "YES" ]] && \
   gcloud_get_key "${IAM}" "${KEY_PATH}"
