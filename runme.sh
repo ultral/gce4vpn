@@ -378,6 +378,7 @@ function cleanup() {
 
   log_message --wait --text "Cleanup ALL"
 
+  gsutil rb gs://gcp-adm_tfstate/ || log_message --wait --text "ERR bucket"
   gcloud iam service-accounts delete "${IAM}" || log_message --wait --text "ERR iam"
 
   gcloud services disable serviceusage.googleapis.com || log_message --wait --text "ERR srv"
