@@ -5,6 +5,8 @@ module "gcp" {
   k8s_cluster_primary_zone = "${var.gce_region}-a"
   k8s_cluster_slave_zone1  = "${var.gce_region}-b"
   k8s_cluster_slave_zone2  = "${var.gce_region}-c"
+  tfstate_region = "${var.gce_region}"
+  tfstate_bucket = "${var.tfstate_bucket}"
 }
 
 module "pki" {

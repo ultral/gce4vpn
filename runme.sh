@@ -207,11 +207,17 @@ gcloud_init () {
   log_message --text "Enable API"
   log_message --color "${YELLOW}" --text \
     "gcloud services enable container.googleapis.com"
+  log_message --color "${YELLOW}" --text \
+    "gcloud services enable storage-api.googleapis.com"
+  log_message --color "${YELLOW}" --text \
+    "gcloud services enable storage-component.googleapis.com"
   log_message --wait --color "${YELLOW}" --text \
     "gcloud services enable serviceusage.googleapis.com"
 
   gcloud services enable serviceusage.googleapis.com
   gcloud services enable container.googleapis.com
+  gcloud services enable storage-api.googleapis.com
+  gcloud services enable storage-component.googleapis.com
 }
 
 ###############################################################################

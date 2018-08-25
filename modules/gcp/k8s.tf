@@ -15,6 +15,8 @@ resource "google_container_cluster" "gcp_vpn" {
     password = "${var.k8s_admin_password}}"
   }
 
+  monitoring_service = "monitoring.googleapis.com"
+
   node_config {
     machine_type = "${var.k8s_node_machine_type}"
     disk_size_gb = "${var.k8s_node_disk_size}"
@@ -31,4 +33,5 @@ resource "google_container_cluster" "gcp_vpn" {
 
     tags = ["gce4vpn"]
   }
+  depends_on = ["google_project_service.monitoring"]
 }

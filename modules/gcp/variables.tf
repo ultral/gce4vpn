@@ -37,3 +37,11 @@ variable "k8s_node_disk_size" {
   description = "Node disk size in GB."
   default = 20
 }
+
+variable "tfstate_region" {
+  description = "Region for terraform state."
+}
+
+variable "tfstate_bucket" {
+  description = "Bucket for terraform state."
+}
