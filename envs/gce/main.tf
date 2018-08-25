@@ -1,16 +1,12 @@
-module "gcp4tfstate" {
-  source = "../../modules/gcp4tfstate"
-  tfstate_region = "${var.gce_region}"
-  tfstate_bucket = "${var.tfstate_bucket}"
-}
-
-module "k8s" {
-  source = "../../modules/k8s"
+module "gcp" {
+  source = "../../modules/gcp"
   k8s_admin_username  = "${var.k8s_admin_username}"
   k8s_admin_password  = "${var.k8s_admin_password}"
   k8s_cluster_primary_zone = "${var.gce_region}-a"
   k8s_cluster_slave_zone1  = "${var.gce_region}-b"
   k8s_cluster_slave_zone2  = "${var.gce_region}-c"
+  tfstate_region = "${var.gce_region}"
+  tfstate_bucket = "${var.tfstate_bucket}"
 }
 
 module "pki" {

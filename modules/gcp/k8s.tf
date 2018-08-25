@@ -18,8 +18,8 @@ resource "google_container_cluster" "gcp_vpn" {
   monitoring_service = "monitoring.googleapis.com"
 
   node_config {
-    machine_type = "${var.node_machine_type}"
-    disk_size_gb = "${var.node_disk_size}"
+    machine_type = "${var.k8s_node_machine_type}"
+    disk_size_gb = "${var.k8s_node_disk_size}"
     oauth_scopes = [
       "https://www.googleapis.com/auth/compute",
       "https://www.googleapis.com/auth/devstorage.read_only",
@@ -33,4 +33,12 @@ resource "google_container_cluster" "gcp_vpn" {
 
     tags = ["gce4vpn"]
   }
+  depends_on = [
+    "google_project_service.container",
+    "google_project_service.compute",
+    "google_project_service.containerregistry",
+    "google_project_service.oslogin",
+    "google_project_service.bigqueryjson"
+    "google_project_service.monitoring"
+    ]
 }

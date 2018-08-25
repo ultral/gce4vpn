@@ -6,7 +6,7 @@ VM for managing VPN in GCE
 ```
 $ vagrant up
 $ vagrant ssh
-$ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config
+$ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key
 ```
 
 # Start
@@ -64,8 +64,6 @@ $ docker build --build-arg http_proxy=$http_proxy --build-arg https_proxy=$http_
 $ gcloud container clusters get-credentials gce4vpn-k8s --zone europe-north1-a
 
 $ kubectl get pods
-
-#standard_init_linux.go:190: exec user process caused "no such file or directory"
 
 
 ```
