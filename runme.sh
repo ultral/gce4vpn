@@ -108,7 +108,7 @@ usage () {
   echo "-h|--help              - print this help"
   echo ""
   echo "Example:"
-  echo "/vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key"
+  echo "/vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key --create-account"
   echo ""
   echo "Note: script read settings from terraform config <PLAN_DIR>/config_secrets.tfvars:"
   echo "${PLAN_DIR}/config_secrets.tfvars"
@@ -365,20 +365,10 @@ openvpn_getclient () {
 function cleanup() {
   local PLAN_DIR
   local OPENVPN_DIR
-  local IAM
   PLAN_DIR="$1"
   OPENVPN_DIR="$2"
-  IAM="$3"
-
-  log_message --wait --text "Cleanup ALL"
 
   gsutil rb gs://gcp-adm_tfstate/ || log_message --wait --text "ERR bucket"
-  gcloud iam service-accounts delete "${IAM}" || log_message --wait --text "ERR iam"
-
-  gcloud services disable serviceusage.googleapis.com || log_message --wait --text "ERR srv"
-  gcloud services disable container.googleapis.com || log_message --wait --text "ERR gke"
-  gcloud services disable storage-api.googleapis.com || log_message --wait --text "ERR api"
-  gcloud services disable storage-component.googleapis.com || log_message --wait --text "ERR str"
 
   log_message --text "Cleanup files"
   rm -rvf ~/.key.json
@@ -423,7 +413,7 @@ done
   gcloud_init "${PROJECT_ID}" "${BILLING_ID}"
 
 [[ "${GCLOUD_NEW_ACCOUNT}" = "YES" ]] && \
-  gcloud_new_account "${PROJECT_ID}" "${SERVICE_ACCOUNT}" "${IAM}"
+  gcloud_new_account "${PROJECT_ID}" "${SERVICE_ACCOUNT}"
 
 [[ "${GCLOUD_GET_KEY}" = "YES" ]] && \
   gcloud_get_key "${IAM}" "${KEY_PATH}"
