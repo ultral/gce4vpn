@@ -172,6 +172,14 @@ gcloud_new_account () {
   gcloud projects add-iam-policy-binding "${PROJECT_NAME}" \
     --member "serviceAccount:${IAM}" \
     --role roles/owner
+
+  log_message --wait --color "${YELLOW}" --text \
+    "gcloud projects add-iam-policy-binding gce4vpn25 \
+      --member="serviceAccount:terraform@gce4vpn25.iam.gserviceaccount.com" \
+      --role='roles/servicemanagement.admin'"
+  gcloud projects add-iam-policy-binding gce4vpn25 \
+    --member="serviceAccount:terraform@gce4vpn25.iam.gserviceaccount.com" \
+    --role='roles/servicemanagement.admin'
 }
 
 ###############################################################################
