@@ -24,7 +24,7 @@ CURPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PLAN_DIR="${CURPATH}/envs/gce"
 
 # google cloud access key location
-KEY_PATH="${PLAN_DIR}/.key.json"
+KEY_PATH="/home/vagrant/.key.json"
 
 # path to directory with PKI
 PKI_DIR="/home/vagrant"
@@ -128,13 +128,18 @@ gcloud_get_key () {
   SECRET_KEY_PATH="$2"
 
   log_message --text "Create keys for '${IAM}'"
-  log_message --wait --color "
-    gcloud iam service-accounts keys create \
+  log_message --wait --color "${YELLOW}" --text \
+    "gcloud iam service-accounts keys create \
       --iam-account \"${IAM}\" \
       \"${SECRET_KEY_PATH}\""
   gcloud iam service-accounts keys create \
     --iam-account "${IAM}" \
     "${SECRET_KEY_PATH}"
+
+  log_message --text "Set env var for accessing google"
+  log_message --wait --color "${YELLOW}" --text \
+    "export GOOGLE_APPLICATION_CREDENTIALS=\"${SECRET_KEY_PATH}\""
+  export GOOGLE_APPLICATION_CREDENTIALS="${SECRET_KEY_PATH}"
 }
 
 ###############################################################################
@@ -200,10 +205,13 @@ gcloud_init () {
     --billing-account "${BILLING_ID}"
 
   log_message --text "Enable API"
+  log_message --color "${YELLOW}" --text \
+    "gcloud services enable container.googleapis.com"
   log_message --wait --color "${YELLOW}" --text \
     "gcloud services enable serviceusage.googleapis.com"
 
   gcloud services enable serviceusage.googleapis.com
+  gcloud services enable container.googleapis.com
 }
 
 ###############################################################################
@@ -360,7 +368,7 @@ function cleanup() {
   PLAN_DIR="$1"
   OPENVPN_DIR="$2"
   log_message --wait --text "Cleanup vm"
-  rm -rvf "${PLAN_DIR}/.key.json"
+  rm -rvf ~/.key.json
   rm -rvf .terraform*
   rm -rvf terraform.tfstate
   rm -rvf ~/.gcloud/

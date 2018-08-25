@@ -34,11 +34,6 @@ resource "google_container_cluster" "gcp_vpn" {
     tags = ["gce4vpn"]
   }
   depends_on = [
-    "google_project_service.container",
-    "google_project_service.compute",
-    "google_project_service.containerregistry",
-    "google_project_service.oslogin",
-    "google_project_service.bigqueryjson",
     "google_project_service.monitoring"
     ]
 }
