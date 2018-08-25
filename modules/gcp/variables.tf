@@ -28,12 +28,20 @@ variable "k8s_cluster_slave_zone2" {
   description = "Cluster slave zone name."
 }
 
-variable "node_machine_type" {
+variable "k8s_node_machine_type" {
   description = "GCE machine type"
   default = "n1-standard-2"
 }
 
-variable "node_disk_size" {
+variable "k8s_node_disk_size" {
   description = "Node disk size in GB."
   default = 20
+}
+
+variable "tfstate_region" {
+  description = "Region for terraform state."
+}
+
+variable "tfstate_bucket" {
+  description = "Bucket for terraform state."
 }
