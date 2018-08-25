@@ -33,7 +33,5 @@ resource "google_container_cluster" "gcp_vpn" {
 
     tags = ["gce4vpn"]
   }
-  depends_on = [
-    "google_project_service.monitoring"
-    ]
+  depends_on = ["google_project_service.monitoring"]
 }

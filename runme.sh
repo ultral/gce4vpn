@@ -207,11 +207,17 @@ gcloud_init () {
   log_message --text "Enable API"
   log_message --color "${YELLOW}" --text \
     "gcloud services enable container.googleapis.com"
+  log_message --color "${YELLOW}" --text \
+    "gcloud services enable storage-api.googleapis.com"
+  log_message --color "${YELLOW}" --text \
+    "gcloud services enable storage-component.googleapis.com"
   log_message --wait --color "${YELLOW}" --text \
     "gcloud services enable serviceusage.googleapis.com"
 
   gcloud services enable serviceusage.googleapis.com
   gcloud services enable container.googleapis.com
+  gcloud services enable storage-api.googleapis.com
+  gcloud services enable storage-component.googleapis.com
 }
 
 ###############################################################################
@@ -365,9 +371,21 @@ openvpn_getclient () {
 function cleanup() {
   local PLAN_DIR
   local OPENVPN_DIR
+  local IAM
   PLAN_DIR="$1"
   OPENVPN_DIR="$2"
-  log_message --wait --text "Cleanup vm"
+  IAM="$3"
+
+  log_message --wait --text "Cleanup ALL"
+
+  gcloud iam service-accounts delete "${IAM}" || log_message --wait --text "ERR iam"
+
+  gcloud services disable serviceusage.googleapis.com || log_message --wait --text "ERR srv"
+  gcloud services disable container.googleapis.com || log_message --wait --text "ERR gke"
+  gcloud services disable storage-api.googleapis.com || log_message --wait --text "ERR api"
+  gcloud services disable storage-component.googleapis.com || log_message --wait --text "ERR str"
+
+  log_message --text "Cleanup files"
   rm -rvf ~/.key.json
   rm -rvf .terraform*
   rm -rvf terraform.tfstate
@@ -404,7 +422,7 @@ done
 ###############################################################################
 
 [[ "${CLEANUP}" = "YES" ]] && \
-  cleanup "${PLAN_DIR}" "${PKI_DIR}"
+  cleanup "${PLAN_DIR}" "${PKI_DIR}" "${IAM}"
 
 [[ "${GCLOUD_INIT}" = "YES" ]] && \
   gcloud_init "${PROJECT_ID}" "${BILLING_ID}"
