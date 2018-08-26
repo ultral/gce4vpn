@@ -421,13 +421,13 @@ done
 ###############################################################################
 
 [[ "${CLEANUP}" = "YES" ]] && \
-  cleanup "${PLAN_DIR}" "${PKI_DIR}" "${IAM}"
+  cleanup "${PLAN_DIR}" "${PKI_DIR}"
 
 [[ "${GCLOUD_INIT}" = "YES" ]] && \
   gcloud_init "${PROJECT_ID}" "${BILLING_ID}"
 
 [[ "${GCLOUD_NEW_ACCOUNT}" = "YES" ]] && \
-  gcloud_new_account "${PROJECT_ID}" "${SERVICE_ACCOUNT}"
+  gcloud_new_account "${PROJECT_ID}" "${SERVICE_ACCOUNT}" "${IAM}"
 
 [[ "${GCLOUD_GET_KEY}" = "YES" ]] && \
   gcloud_get_key "${IAM}" "${KEY_PATH}"
