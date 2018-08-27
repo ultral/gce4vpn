@@ -12,7 +12,7 @@ $ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-con
 ```
 
 # schema
-![schema](schema.png?raw=true "Schema")
+![schema](schema.jpg?raw=true "Schema")
 
 # Credits
 I used code from zambien's and kylemanna's openvpn repos in this work:
