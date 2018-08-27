@@ -11,6 +11,9 @@ $ vagrant ssh
 $ /vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key --create-account
 ```
 
+# schema
+![schema](schema.png)
+
 # Credits
 I used code from zambien's and kylemanna's openvpn repos in this work:
 [pieterlange/kube-openvpn](https://github.com/pieterlange/kube-openvpn)
