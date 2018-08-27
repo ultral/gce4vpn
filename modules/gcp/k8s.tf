@@ -12,7 +12,7 @@ resource "google_container_cluster" "gcp_vpn" {
 
   master_auth {
     username = "${var.k8s_admin_username}"
-    password = "${var.k8s_admin_password}}"
+    password = "${var.k8s_admin_password}"
   }
 
   monitoring_service = "monitoring.googleapis.com"
