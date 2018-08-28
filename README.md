@@ -28,4 +28,13 @@ $ gcloud projects add-iam-policy-binding gcp-adm \
   --member="serviceAccount:terraform@gcp-adm.iam.gserviceaccount.com" \
   --role='roles/servicemanagement.admin'
 $ gcloud projects get-iam-policy gcp-adm
+$ sudo -E yum -y install graphviz && terraform  graph /vagrant/envs/gce/ | dot -Tsvg > graph.svg
+```
+
+## push state to remote
+```
+$ export GOOGLE_APPLICATION_CREDENTIALS=/home/vagrant/.key.json
+$ echo 'terraform { backend "gcs" { bucket  = "gce4vpn31_tfstate" } }' > /vagrant/envs/gce/gcs.tf
+$ cd /vagrant/envs/gce/ && terraform state push -force /home/vagrant/terraform.tfstate
+$ terraform plan -var-file=./config_secrets.tfvars
 ```
