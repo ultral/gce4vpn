@@ -23,14 +23,14 @@ CURPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 # terraform plan location
 PLAN_DIR="${CURPATH}/envs/gce"
 
-# google cloud access key location
-KEY_PATH="/home/vagrant/.key.json"
-
 # path to directory with PKI
-PKI_DIR="/home/vagrant"
+PKI_DIR=$(mktemp -d)
+
+# google cloud access key location
+KEY_PATH="${PKI_DIR}/.key.json"
 
 # Default openvpn client name
-USER_NAME='lev'
+USER_NAME='ogle'
 
 # Project ID in google cloud
 PROJECT_ID=$(get_value "${PLAN_DIR}/config_secrets.tfvars" "project")
@@ -108,7 +108,7 @@ usage () {
   echo "-h|--help              - print this help"
   echo ""
   echo "Example:"
-  echo "/vagrant/runme.sh --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key --create-account"
+  echo "$0 --gcloud-init --terraform-apply --openvpn-init --openvpn-config --get-google-key --create-account"
   echo ""
   echo "Note: script read settings from terraform config <PLAN_DIR>/config_secrets.tfvars:"
   echo "${PLAN_DIR}/config_secrets.tfvars"
@@ -165,7 +165,7 @@ gcloud_new_account () {
 
   log_message --text "Grant owner permissions for '${IAM}' to '${PROJECT_NAME}'"
   log_message --wait --color "${YELLOW}" --text \
-    "cloud projects add-iam-policy-binding \"${PROJECT_NAME}\" \
+    "gcloud projects add-iam-policy-binding \"${PROJECT_NAME}\" \
       --member \"serviceAccount:${IAM}\" \
       --role roles/owner"
 
@@ -173,13 +173,15 @@ gcloud_new_account () {
     --member "serviceAccount:${IAM}" \
     --role roles/owner
 
+  log_message --text "Grant Service Management API Admin permissions for '${IAM}' to '${PROJECT_NAME}'"
   log_message --wait --color "${YELLOW}" --text \
-    "gcloud projects add-iam-policy-binding gce4vpn25 \
-      --member="serviceAccount:terraform@gce4vpn25.iam.gserviceaccount.com" \
-      --role='roles/servicemanagement.admin'"
-  gcloud projects add-iam-policy-binding gce4vpn25 \
-    --member="serviceAccount:terraform@gce4vpn25.iam.gserviceaccount.com" \
-    --role='roles/servicemanagement.admin'
+    "gcloud projects add-iam-policy-binding \"${PROJECT_NAME}\" \
+      --member \"serviceAccount:${IAM}\" \
+      --role roles/servicemanagement.admin"
+
+  gcloud projects add-iam-policy-binding "${PROJECT_NAME}" \
+    --member "serviceAccount:${IAM}" \
+    --role roles/servicemanagement.admin
 }
 
 ###############################################################################
@@ -204,12 +206,12 @@ gcloud_init () {
   log_message --text \
     "Link billing account '${BILLING_ID}' with project '${PROJECT_NAME}'"
   gcloud projects list
-  gcloud alpha billing accounts list
+  gcloud billing accounts list
   log_message --wait --color "${YELLOW}" --text \
-    "gcloud alpha billing projects link \"${PROJECT_NAME}\" \
+    "gcloud billing projects link \"${PROJECT_NAME}\" \
       --billing-account \"${BILLING_ID}\""
 
-  gcloud alpha billing projects link "${PROJECT_NAME}" \
+  gcloud billing projects link "${PROJECT_NAME}" \
     --billing-account "${BILLING_ID}"
 
   log_message --text "Enable API"
