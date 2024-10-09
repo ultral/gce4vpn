@@ -26,6 +26,8 @@ PLAN_DIR="${CURPATH}/envs/gce"
 # path to directory with PKI
 PKI_DIR=$(mktemp -d)
 
+chmod go+rwx $PKI_DIR
+
 # google cloud access key location
 KEY_PATH="${PKI_DIR}/.key.json"
 
