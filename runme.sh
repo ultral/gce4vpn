@@ -244,26 +244,22 @@ terraform_run () {
 
   log_message --text "Initialize terraform in '${PLAN_DIR}'"
   log_message --wait --color "${YELLOW}" --text \
-    "terraform init \"${PLAN_DIR}\""
-  terraform init "${PLAN_DIR}"
+    "terraform -chdir=\"${PLAN_DIR}\" init"
+  terraform -chdir="${PLAN_DIR}" init
 
   log_message --text "Create terraform plan"
   log_message --wait --color "${YELLOW}" --text \
-    "terraform plan \
-      -var-file=\"${PLAN_DIR}/config_secrets.tfvars\" \
-      \"${PLAN_DIR}\""
-  terraform plan \
-    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
-    "${PLAN_DIR}"
+    "terraform -chdir=\"${PLAN_DIR}\" plan \
+      -var-file=\"${PLAN_DIR}/config_secrets.tfvars\""
+  terraform -chdir="${PLAN_DIR}" plan \
+    -var-file="${PLAN_DIR}/config_secrets.tfvars"
 
   log_message --text "Apply terraform plan"
   log_message --wait --color "${YELLOW}" --text \
-    "terraform apply \
-      -var-file=\"${PLAN_DIR}/config_secrets.tfvars\" \
-      \"${PLAN_DIR}\""
-  terraform apply \
-    -var-file="${PLAN_DIR}/config_secrets.tfvars" \
-    "${PLAN_DIR}"
+    "terraform -chdir=\"${PLAN_DIR}\" apply \
+      -var-file=\"${PLAN_DIR}/config_secrets.tfvars\""
+  terraform -chdir="${PLAN_DIR}" apply \
+    -var-file="${PLAN_DIR}/config_secrets.tfvars"
 }
 
 ###############################################################################
@@ -389,7 +385,7 @@ function cleanup() {
   gsutil rb gs://gcp-adm_tfstate/ || log_message --wait --text "ERR bucket"
 
   log_message --text "Cleanup files"
-  rm -rvf ~/.key.json
+  rm -rvf $KEY_PATH
   rm -rvf .terraform*
   rm -rvf terraform.tfstate
   rm -rvf ~/.gcloud/
