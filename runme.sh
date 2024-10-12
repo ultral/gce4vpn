@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+NO_WAIT=1
+
 ###############################################################################
 # Func:   get_value
 # Note:   Get value from ini file
@@ -25,6 +27,7 @@ PLAN_DIR="${CURPATH}/envs/gce"
 
 # path to directory with PKI
 PKI_DIR=$(mktemp -d)
+export TF_VAR_openvpn_files=$PKI_DIR
 
 chmod go+rwx $PKI_DIR
 
@@ -82,7 +85,7 @@ function log_message() {
 
   echo -e "$(date +"%Y-%m-%d %H:%M:%S"): ${l_color}${l_text}${NC}"
 
-  if [[ "${l_wait}" = "yes" ]] ; then
+  if [[ "${l_wait}" = "yes" ]]  && [ -z "$NO_WAIT" ]; then
     echo -e "$(date +"%Y-%m-%d %H:%M:%S"): ${GREEN}Press enter to continue ${NC}"
     read -r
   fi
@@ -260,6 +263,8 @@ terraform_run () {
       -var-file=\"${PLAN_DIR}/config_secrets.tfvars\""
   terraform -chdir="${PLAN_DIR}" apply \
     -var-file="${PLAN_DIR}/config_secrets.tfvars"
+
+  log_message --color green --text "PKI Dir: $PKI_DIR"
 }
 
 ###############################################################################
@@ -317,6 +322,11 @@ openvpn_initpki () {
     -e EASYRSA_CRL_DAYS=180 \
     -v "${OPENVPN_DIR}":/etc/openvpn:z \
     -ti ptlange/openvpn easyrsa gen-crl
+
+  # TODO: Fix the user properly instead of chown
+  sudo chown -R $USER: $PKI_DIR
+
+  log_message --color green --text "PKI Dir: $PKI_DIR"
 }
 
 ###############################################################################
@@ -368,6 +378,8 @@ openvpn_getclient () {
     ovpn_getclient "${OPENVPN_USER}" > "${OPENVPN_USER}.ovpn"
 
   log_message --text "Config saved as ${OPENVPN_USER}.ovpn"
+
+  log_message --color green --text "PKI Dir: $PKI_DIR"
 }
 
 ###############################################################################
