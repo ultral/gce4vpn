@@ -20,12 +20,12 @@ variable "openvpn_files" {
 
 variable "gce_region" {
   description = "Cluster region name."
-  default = "europe-north1"
+  default     = "europe-north1"
 }
 
 variable "openvpn_publish_port" {
   description = "Openvpn port."
-  default = 443
+  default     = 443
 }
 
 variable "tfstate_bucket" {
